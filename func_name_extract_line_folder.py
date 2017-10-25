@@ -144,9 +144,19 @@ def func_name_extract(file_path):
             if func_name != None:
                 start_line = i
                 left_brack_num = 0
+                effective_line = 1
                 while True:
+#                    print i
                     line = (file_list[i]).strip()
+                    line_type = get_line_type(line)
+                    if line_type == "comment_line":
+                        continue
+#                    elif line_type == "comment_paragraph":
+#                        continue
+#                        while not is_comment_end(file_list[i]):
+#                            i += 1
                     left_brack_num += line.count('{')
+                    effective_line += 1
                     if "}" in line:
                         left_brack_num -= line.count("}")
                         if left_brack_num < 1:
@@ -155,7 +165,8 @@ def func_name_extract(file_path):
                     i += 1
                 end_line = i
                # if func_name != None:
-                func_list.append([file_path, func_name, start_line + 1, end_line + 1, end_line - start_line + 1])
+                func_list.append([file_path, func_name, start_line + 1, end_line + 1, effective_line])
+#                print func_name
     return func_list
 
 def func_name_extract_folder(work_folder):
@@ -166,6 +177,9 @@ def func_name_extract_folder(work_folder):
             for ext in valid_ext:
                 if name.endswith(ext):
                     file_path = os.path.join(dirpath, name)
+                    if name == "func_tbl.c":
+                        continue
+                    print file_path
                     func_list_all = func_list_all + func_name_extract(file_path)
 
     return func_list_all
