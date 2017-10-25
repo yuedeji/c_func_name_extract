@@ -1,4 +1,4 @@
-# Extract Function Name in C/C++ Source Codes
+# Extract Function Name and Begin/End Line Number in C/C++ Source Codes
 
 This is a simple project to extract the function names in C/C++ source codes. It should work well for C codes, but may have problems for C++ codes. It is written in Python. Please let me know if you find any bugs.
 
@@ -14,4 +14,6 @@ Example:
     
     python func_name_extract.py sample_codes/pow_related_errors.c result.txt 
 
+
+Extend to support begin/end line number of a function.
 
