@@ -165,7 +165,7 @@ def func_name_extract(file_path):
                     i += 1
                 end_line = i
                # if func_name != None:
-                func_list.append([file_path, func_name, start_line + 1, end_line + 1, effective_line])
+                func_list.append([file_path, func_name, start_line + 1, end_line + 1, end_line - start_line + 1])
 #                print func_name
     return func_list
 
