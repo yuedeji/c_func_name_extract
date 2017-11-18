@@ -4,9 +4,14 @@ import pickle
 import re
 import sys
 import csv
+import re
 type_list = ['int', 'char', 'float', 'double', 'bool', 'void', 'short', 'long', 'signed', 'struct']
 
 valid_ext = [".c", ".cpp"]
+
+re_removed = "(\'.*\')|(\".*\")|(/\*.*\*/)|(//.*)"
+
+keyword_set = set(type_list + ['sizeof'])
 
 def pickle_dump(root_path, data, file_name):
     os.chdir(root_path)
@@ -25,6 +30,8 @@ def pickle_load(root_path, file_name):
 def is_valid_name(name):
     if re.match("[a-zA-Z_][a-zA-Z0-9_]*", name) == None:
         return False
+    if name in keyword_set:
+        return False
     return True
 
 def is_func(line):
@@ -42,7 +49,11 @@ def is_func(line):
 # Rule 3: # stands for #include or other primitives; / start a comment
     if line[0] == '#' or line[0] == '/':
         return None
-
+# Rule 4: ends with ;
+    if line.endswith(';'):
+        return None
+    if line.startswith('static'):
+        line = line[len('static'):]
 # replace pointer * and & as space
     line = re.sub('\*', ' ', line)
     line = re.sub('\&', ' ', line)
@@ -140,17 +151,23 @@ def func_name_extract(file_path):
             while not is_comment_end(file_list[i]):
                 i += 1
         else:
+            line = re.sub(re_removed, "", line)
+            if len(line) == 0:
+                continue
             func_name = is_func(line)
             if func_name != None:
+#                print i, func_name
                 start_line = i
                 left_brack_num = 0
                 effective_line = 1
-                while True:
+                while True and i < len(file_list):
 #                    print i
+#                    print line
                     line = (file_list[i]).strip()
                     line_type = get_line_type(line)
                     if line_type == "comment_line":
                         continue
+
 #                    elif line_type == "comment_paragraph":
 #                        continue
 #                        while not is_comment_end(file_list[i]):
@@ -177,8 +194,8 @@ def func_name_extract_folder(work_folder):
             for ext in valid_ext:
                 if name.endswith(ext):
                     file_path = os.path.join(dirpath, name)
-                    if name == "func_tbl.c":
-                        continue
+#                    if name == "func_tbl.c":
+#                        continue
                     print file_path
                     func_list_all = func_list_all + func_name_extract(file_path)
 
